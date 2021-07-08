@@ -236,6 +236,10 @@ abstract class TranslatableBehavior extends ExtensionBase
         }
 
         if ($locale == $this->translatableDefault) {
+            if (Str::startsWith($key, 'pivot_')) {
+                $pivotAttribute = str_replace('pivot_', '', $key);
+                return $this->setAttributeFromData($this->model->pivot->attributes, $pivotAttribute, $value);
+            }
             return $this->setAttributeFromData($this->model->attributes, $key, $value);
         }
 

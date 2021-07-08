@@ -150,10 +150,17 @@ trait MLControl
         $key = $this->valueFrom ?: $this->fieldName;
 
         /*
-         * Get the translated values from the model
-         */
-        $studKey = Str::studly(implode(' ', HtmlHelper::nameToArray($key)));
-        $mutateMethod = 'get'.$studKey.'AttributeTranslated';
+      * Get the translated values from the model
+      */
+        $keyAsArray = HtmlHelper::nameToArray($key);
+
+        // if the key is a pivot field, convert it to underline notation, so the pivot model picks it up
+        if (Str::startsWith($key, 'pivot[')) {
+            $key = implode('_', $keyAsArray);
+        }
+
+        $studKey = Str::studly(implode(' ', $keyAsArray));
+        $mutateMethod = 'get' . $studKey . 'AttributeTranslated';
 
         if ($this->objectMethodExists($this->model, $mutateMethod)) {
             $value = $this->model->$mutateMethod($locale);
@@ -194,8 +201,15 @@ trait MLControl
         /*
          * Set the translated values to the model
          */
-        $studKey = Str::studly(implode(' ', HtmlHelper::nameToArray($key)));
-        $mutateMethod = 'set'.$studKey.'AttributeTranslated';
+        $keyAsArray = HtmlHelper::nameToArray($key);
+
+        // if the key is a pivot field, convert it to underline notation, the the pivot model picks it up
+        if (Str::startsWith($key, 'pivot[')) {
+            $key = implode('_', $keyAsArray);
+        }
+
+        $studKey = Str::studly(implode(' ', $keyAsArray));
+        $mutateMethod = 'set' . $studKey . 'AttributeTranslated';
 
         if ($this->objectMethodExists($this->model, $mutateMethod)) {
             foreach ($localeData as $locale => $value) {
